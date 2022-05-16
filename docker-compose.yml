@@ -1,0 +1,34 @@
+version: '3'
+services:
+  database:
+    image: postgres
+    container_name: "piece_db"
+    ports:
+      - "5432:5432"
+    env_file:
+      - .env
+    volumes:
+      - ./db/init.sql:/docker-entrypoint-initdb.d/create_tables.sql
+    networks:
+      pieceNetwork:
+        ipv4_address: 173.16.0.4
+
+  api:
+    build: .
+    ports:
+      - "8000:8000"
+    environment:
+      postgres_host: 173.16.0.4
+    env_file:
+      - .env
+    networks:
+      pieceNetwork:
+        ipv4_address: 173.16.0.3
+
+networks:
+  pieceNetwork:
+    driver: bridge
+    ipam:
+      driver: default
+      config:
+        - subnet: 173.16.0.0/24
